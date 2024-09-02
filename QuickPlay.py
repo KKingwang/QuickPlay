@@ -177,15 +177,19 @@ def registration_shortcuts():
     注册快捷键
     :return:
     """
-    config_data_list = bin.ConfigOperation.load_config()
-    for entry in config_data_list:
-        audio_file_path = "./music/" + entry[0]
-        # keyboard.register_hotkey(bin.Shortcutnew.convert_shortcut(entry[1]), None,
-        #                          lambda: bin.Audio.play_sound_effects(audio_file_path, gSoundVolume, gAudioDriverId))
-        with keyboard.GlobalHotKeys({
-            entry[1]: lambda: bin.Audio.play_sound_effects("./music/" + entry[0], gSoundVolume, gAudioDriverId)
-        }) as j:
-            j.join()
+    # config_data_list = bin.ConfigOperation.load_config()
+    # for entry in config_data_list:
+    #     audio_file_path = "./music/" + entry[0]
+    #     keyboard.register_hotkey(bin.Shortcutnew.convert_shortcut(entry[1]), None,
+    #                              lambda: bin.Audio.play_sound_effects(audio_file_path, gSoundVolume, gAudioDriverId))
+    config_data_list = bin.ConfigOperation.load_config()  # 读取配置文件
+    hotkeys = {}  # 创建一个字典用于存储所有快捷键和对应的操作
+    for entry in config_data_list:  # 遍历配置列表，将每个快捷键和其对应的操作添加到字典中
+        hotkeys[entry[1]] = lambda e=entry: bin.Audio.play_sound_effects("./music/" + e[0], gSoundVolume,
+                                                                         gAudioDriverId)
+
+    with keyboard.GlobalHotKeys(hotkeys) as listener:  # 在所有快捷键注册完成后，创建一个 GlobalHotKeys 实例
+        listener.join()  # 启动全局监听器
 
 
 def information_about():
